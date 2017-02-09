@@ -2,30 +2,30 @@
 
 using namespace std;
 
-void mkfs() {;}
+void mkfs();
 
-void open(string fname, string flag) {;}
+void open(string fname, string flag);
 
-void read(int fd, int size) {;}
+void read(int fd, int size);
 
-void write(int fd, string contents) {;}
+void write(int fd, string contents);
 
-void seek(int fd, int offset) {;}
+void seek(int fd, int offset);
 
-void close(int fd) {;}
+void close(int fd);
 
-void mkdir(string directory) {;}
+void mkdir(string directory);
 
-void rmdir(string directory) {;}
+void rmdir(string directory);
 
-void cd(string directory) {;}
+void cd(string directory);
 
-void ls() {;}
+void ls();
 
-void cat(string fname) {;}
+void cat(string fname);
 
-void tree() {;}
+void tree();
 
-void import_file(string source, string destination) {;}
+void import_file(string source, string destination);
 
-void export_file(string source, string destination) {;}
+void export_file(string source, string destination);
