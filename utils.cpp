@@ -4,9 +4,14 @@
 
 using namespace std;
 
-// #####################################################
-// # Function for breaking up user input into commands #
-// #####################################################
+// ##########################################################################
+// # Function for breaking up user input into commands delimeted by spaces, #
+// # at which point each space separated input is placed into a vector.     #
+// # Also checks for quotation marks for the writing of content to files.   #
+//                                                                          #
+// # Ex: write 5 "Hey!!" ---> vector: {write, 5, "Hey!!"}                   #
+//                                                                          #
+// ##########################################################################
 vector<string> break_string(string s) {
   string input;
   vector<string> inputs;
