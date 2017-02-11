@@ -1,5 +1,7 @@
+#include <iostream>
 #include <string>
+#include <vector>
 
-//using namespace std;
+using namespace std;
 
-//void fetch_command(string input) {;}
+vector<string> break_string(string s);
