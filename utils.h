@@ -5,3 +5,5 @@
 using namespace std;
 
 vector<string> break_string(string s);
+
+void validate_and_call(vector<string> cmd);

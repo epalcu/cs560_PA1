@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include "commands.cpp"
 #include "utils.cpp"
 #include "fs.cpp"
 
@@ -12,9 +11,10 @@ int main(int argc, char* argv[]) {
     cout << "sh ";
     while(getline(cin, cmd)) { // May end up being its own function and moved into utils.cpp
       if (cmd.compare("exit()") == 0) break;
-      cout << "sh ";
       cmd += '\n';
       command = break_string(cmd);
+      validate_and_call(command);
+      cout << "sh ";
     }
     // NOTE: Uncomment to verify user inputs properly separated!!
     // for (int i=0; i<command.size(); i++) {

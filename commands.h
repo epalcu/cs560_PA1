@@ -6,13 +6,13 @@ void mkfs();
 
 void open(string fname, string flag);
 
-void read(int fd, int size);
+void read(string fd, string size);
 
-void write(int fd, string contents);
+void write(string fd, string contents);
 
-void seek(int fd, int offset);
+void seek(string fd, string offset);
 
-void close(int fd);
+void close(string fd);
 
 void mkdir(string directory);
 
@@ -29,3 +29,5 @@ void tree();
 void import_file(string source, string destination);
 
 void export_file(string source, string destination);
+
+void invalid_cmd(string, string);
