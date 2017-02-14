@@ -35,64 +35,71 @@ vector<string> break_string(string s) {
 
 // ##########################################################################
 // # Function for validating whether or not entered command is correct.     #
-// # Yeah, I realize that it looks disgusting, but..it works!!              #
+// # Yeah, I realize that it still looks bad, but it's def more readable    #
+// # now! Maybe..                                                           #
 //                                                                          #
 // # Ex: write 5 ---> Usage: write [fd] [string]                            #
 // # Ex: cl ---> cl: command not found                                      #
 //                                                                          #
 // ##########################################################################
 void validate_and_call(vector<string> cmd) {
+  int size = cmd.size();
   string usage = "";
-  if (cmd.size() == 1) {
-    if (cmd[0].compare("mkfs") == 0) return mkfs();
-    else if (cmd[0].compare("mkfs") == 0) usage = "Usage: open [filename] [flag]";
-    else if (cmd[0].compare("read") == 0) usage = "Usage: read [fd] [size]";
-    else if (cmd[0].compare("write") == 0) usage = "Usage: write [fd] [string]";
-    else if (cmd[0].compare("seek") == 0) usage = "Usage: seek [fd] [offset]";
-    else if (cmd[0].compare("close") == 0) usage = "Usage: close [fd]";
-    else if (cmd[0].compare("mkdir") == 0) usage = "Usage: mkdir [dirname]";
-    else if (cmd[0].compare("rmdir") == 0) usage = "Usage: rmdir [dirname]";
-    else if (cmd[0].compare("cd") == 0) usage = "Usage: cd [dirname]";
-    else if (cmd[0].compare("ls") == 0) return ls();
-    else if (cmd[0].compare("cat") == 0) usage = "Usage: cat [filename]";
-    else if (cmd[0].compare("tree") == 0) return tree();
-    else if (cmd[0].compare("import") == 0) usage = "Usage: import [srcname] [dstname]";
-    else if (cmd[0].compare("export") == 0) usage = "Usage: export [srcname] [dstname]";
-    return invalid_cmd(cmd[0], usage);
+  if (cmd[0].compare("mkfs") == 0) {
+    if (size == 1) return mkfs();
+    else return invalid_cmd(cmd[0], "Usage: mkfs");
   }
-  else if (cmd.size() == 2) {
-    if (cmd[0].compare("mkfs") == 0) usage = "Usage: mkfs";
-    else if (cmd[0].compare("open") == 0) usage = "Usage: open [filename] [flag]";
-    else if (cmd[0].compare("read") == 0) usage = "Usage: read [fd] [size]";
-    else if (cmd[0].compare("write") == 0) usage = "Usage: write [fd] [string]";
-    else if (cmd[0].compare("seek") == 0) usage = "Usage: seek [fd] [offset]";
-    else if (cmd[0].compare("close") == 0) return close(cmd[1]);
-    else if (cmd[0].compare("mkdir") == 0) return mkdir(cmd[1]);
-    else if (cmd[0].compare("rmdir") == 0) return rmdir(cmd[1]);
-    else if (cmd[0].compare("cd") == 0) return cd(cmd[1]);
-    else if (cmd[0].compare("ls") == 0) usage = "Usage: ls";
-    else if (cmd[0].compare("cat") == 0) return cat(cmd[1]);
-    else if (cmd[0].compare("tree") == 0) usage = "Usage: tree";
-    else if (cmd[0].compare("import") == 0) usage = "Usage: import [srcname] [dstname]";
-    else if (cmd[0].compare("export") == 0) usage = "Usage: export [srcname] [dstname]";
-    return invalid_cmd(cmd[0], usage);
+  else if (cmd[0].compare("open") == 0) {
+    if (size == 3) return open(cmd[1], cmd[2]);
+    else return invalid_cmd(cmd[0], "Usage: open [filename] [flag]");
   }
-  else if (cmd.size() == 3) {
-    if (cmd[0].compare("mkfs") == 0) usage = "Usage: mkfs";
-    else if (cmd[0].compare("open") == 0) return open(cmd[1], cmd[2]);
-    else if (cmd[0].compare("read") == 0) return read(cmd[1], cmd[2]);
-    else if (cmd[0].compare("write") == 0) return write(cmd[1], cmd[2]);
-    else if (cmd[0].compare("seek") == 0) return seek(cmd[1], cmd[2]);
-    else if (cmd[0].compare("close") == 0) usage = "Usage: close [fd]";
-    else if (cmd[0].compare("mkdir") == 0) usage = "Usage: mkdir [dirname]";
-    else if (cmd[0].compare("rmdir") == 0) usage = "Usage: rmdir [dirname]";
-    else if (cmd[0].compare("cd") == 0) usage = "Usage: cd [dirname]";
-    else if (cmd[0].compare("ls") == 0) usage = "Usage: ls";
-    else if (cmd[0].compare("cat") == 0) usage = "Usage: cat [filename]";
-    else if (cmd[0].compare("tree") == 0) usage = "Usage: tree";
-    else if (cmd[0].compare("import") == 0) return import_file(cmd[1], cmd[2]);
-    else if (cmd[0].compare("export") == 0) return export_file(cmd[1], cmd[2]);
-    return invalid_cmd(cmd[0], usage);
+  else if (cmd[0].compare("read") == 0) {
+    if (size == 3) return read(cmd[1], cmd[2]);
+    else return invalid_cmd(cmd[0], "Usage: read [fd] [size]");
+  }
+  else if (cmd[0].compare("write") == 0) {
+    if (size == 3) return write(cmd[1], cmd[2]);
+    else return invalid_cmd(cmd[0], "Usage: write [fd] [string]");
+  }
+  else if (cmd[0].compare("seek") == 0) {
+    if (size == 3) return seek(cmd[1], cmd[2]);
+    else return invalid_cmd(cmd[0], "Usage: seek [fd] [offset]");
+  }
+  else if (cmd[0].compare("close") == 0) {
+    if (size == 2) return close(cmd[1]);
+    else return invalid_cmd(cmd[0], "Usage: close [fd]");
+  }
+  else if (cmd[0].compare("mkdir") == 0) {
+    if (size == 2) return mkdir(cmd[1]);
+    else return invalid_cmd(cmd[0], "Usage: mkdir [dirname]");
+  }
+  else if (cmd[0].compare("rmdir") == 0) {
+    if (size == 2) return rmdir(cmd[1]);
+    else return invalid_cmd(cmd[0], "Usage: rmdir [dirname]");
+  }
+  else if (cmd[0].compare("cd") == 0) {
+    if (size == 2) return cd(cmd[1]);
+    else return invalid_cmd(cmd[0], "Usage: cd [dirname]");
+  }
+  else if (cmd[0].compare("ls") == 0) {
+    if (size == 1) return ls();
+    else return invalid_cmd(cmd[0], "Usage: ls");
+  }
+  else if (cmd[0].compare("cat") == 0) {
+    if (size == 2) return cat(cmd[1]);
+    else return invalid_cmd(cmd[0], "Usage: cat [filename]");
+  }
+  else if (cmd[0].compare("tree") == 0) {
+    if (size == 1) return tree();
+    else return invalid_cmd(cmd[0], "Usage: tree");
+  }
+  else if (cmd[0].compare("import") == 0) {
+    if (size == 3) return import_file(cmd[1], cmd[2]);
+    else return invalid_cmd(cmd[0], "Usage: import [srcname] [dstname]");
+  }
+  else if (cmd[0].compare("export") == 0) {
+    if (size == 3) return export_file(cmd[1], cmd[2]);
+    else return invalid_cmd(cmd[0], "Usage: export [srcname] [dstname]");
   }
   else return invalid_cmd(cmd[0], usage);
 }
