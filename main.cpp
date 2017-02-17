@@ -16,9 +16,10 @@ int main(int argc, char* argv[]) {
       validate_and_call(command);
       cout << "sh ";
     }
-    // NOTE: Uncomment to verify user inputs properly separated!!
+    //NOTE: Uncomment to verify user inputs properly separated!!
     // for (int i=0; i<command.size(); i++) {
     //   cout << command[i] << endl;
     // }
+    // cout << command.size();
     return 0;
 }
