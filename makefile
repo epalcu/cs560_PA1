@@ -4,10 +4,10 @@ BIN = main.o commands.o utils.o fs.o
 
 all: main
 
-commands.o: commands.cpp commands.h
+commands.o: commands.cpp commands.h fs.h
 	$(CC) $(CFLAGS) -c commands.cpp
 
-utils.o: utils.cpp utils.h
+utils.o: utils.cpp commands.cpp utils.h
 	$(CC) $(CFLAGS) -c utils.cpp
 
 fs.o: fs.cpp fs.h

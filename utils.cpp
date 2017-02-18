@@ -6,14 +6,9 @@
 
 using namespace std;
 
-// ##########################################################################
-// # Function for breaking up user input into commands delimeted by spaces, #
-// # at which point each space separated input is placed into a vector.     #
-// # Also checks for quotation marks for the writing of content to files.   #
-//                                                                          #
-// # Ex: write 5 "Hey!!" ---> vector: {write, 5, "Hey!!"}                   #
-//                                                                          #
-// ##########################################################################
+string file_system = "file_system.txt";
+int file_descriptor = 1;
+
 vector<string> break_string(string s) {
   string input;
   vector<string> inputs;
@@ -38,15 +33,6 @@ vector<string> break_string(string s) {
   return inputs;
 }
 
-// ##########################################################################
-// # Function for validating whether or not entered command is correct.     #
-// # Yeah, I realize that it still looks bad, but it's def more readable    #
-// # now! Maybe..                                                           #
-//                                                                          #
-// # Ex: write 5 ---> Usage: write [fd] [string]                            #
-// # Ex: cl ---> cl: command not found                                      #
-//                                                                          #
-// ##########################################################################
 void validate_and_call(vector<string> cmd) {
   int size = cmd.size();
   string usage = "";
@@ -107,4 +93,95 @@ void validate_and_call(vector<string> cmd) {
     else return invalid_cmd(cmd[0], "Usage: export [srcname] [dstname]");
   }
   else return invalid_cmd(cmd[0], usage);
+}
+
+void create_file_system() {
+  ofstream ofile;
+  ofile.open(file_system);
+  ofile.close();
+  return;
+}
+
+string retrieve_value(string l, int *j) {
+  string v = "";
+  while (*j < l.length()) {
+    v += l[*j];
+    *j=*j+1;
+  }
+  return v;
+}
+
+file_struct scan_file(string fname, file_struct fs) {
+  ifstream f(file_system);
+  string line, content, val;
+  bool fname_found = false;
+  bool fd_found = false;
+  bool size_found = false;
+  bool offset_found = false;
+  bool contents_found = false;
+  int i=0;
+  if (f.is_open()) {
+    while(getline(f, line)) {
+      content = "";
+      for (int j=0; j<line.length(); j++) {
+        if (content.compare("file name: ") == 0) {
+          val = retrieve_value(line, &j);
+          if (val.compare(fname) == 0) {
+            fname_found = true;
+            fs.fname = val;
+            break;
+          }
+        }
+        else if ((content.compare("fd: ") == 0) && (fname_found)) {
+          val = retrieve_value(line, &j);
+          fd_found = true;
+          fs.fd = stoi(val);
+          break;
+        }
+        else if ((content.compare("size: ") == 0) && (fname_found)) {
+          val = retrieve_value(line, &j);
+          size_found = true;
+          fs.size = val;
+          break;
+        }
+        else if ((content.compare("offset: ") == 0) && (fname_found)) {
+          val = retrieve_value(line, &j);
+          offset_found = true;
+          fs.offset = val;
+          break;
+        }
+        else if ((content.compare("contents: ") == 0) && (fname_found)) {
+          val = retrieve_value(line, &j);
+          contents_found = true;
+          fs.contents = val;
+          break;
+        }
+        else content += line[j];
+      }
+      i++;
+      if ((fname_found) && (fd_found) && (size_found) && (offset_found) && (contents_found)) break;
+    }
+  }
+  else {
+    cout << "Unable to access file system.\n";
+    exit(1);
+  }
+  f.close();
+  if ((i == 0) || (fname_found == false)) {
+    ofstream ofile;
+    ofile.open(file_system, ios::out | ios::app);
+    ofile << "file name: " << fname << '\n';
+    ofile << "fd: " << file_descriptor << '\n';
+    ofile << "size: " << "0" << '\n';
+    ofile << "offset: " << "0" << '\n';
+    ofile << "contents: " << " " << '\n' << '\n';
+    ofile.close();
+    fs.fname = fname;
+    fs.fd = file_descriptor;
+    fs.size = "0";
+    fs.offset = "0";
+    fs.contents = " ";
+    file_descriptor++;
+  }
+  return fs;
 }

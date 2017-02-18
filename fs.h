@@ -3,11 +3,15 @@
 
 using namespace std;
 
+extern string file_system;
+
 class file_struct {
     public:
-        int size;
-        int offset;
-        string contents;
+      string fname;
+      int fd;
+      string size;
+      string offset;
+      string contents;
 };
 
 class directory {
