@@ -7,7 +7,7 @@
 using namespace std;
 
 string file_system = "file_system.txt";
-int file_descriptor = 1;
+//int file_descriptor = 1;
 
 vector<string> break_string(string s) {
   string input;
@@ -111,7 +111,7 @@ string retrieve_value(string l, int *j) {
   return v;
 }
 
-file_struct scan_file(string fname, file_struct fs) {
+file_struct scan_file(string fname, file_struct fs, string flag) {
   ifstream f(file_system);
   string line, content, val;
   bool fname_found = false;
@@ -131,12 +131,6 @@ file_struct scan_file(string fname, file_struct fs) {
             fs.fname = val;
             break;
           }
-        }
-        else if ((content.compare("fd: ") == 0) && (fname_found)) {
-          val = retrieve_value(line, &j);
-          fd_found = true;
-          fs.fd = stoi(val);
-          break;
         }
         else if ((content.compare("size: ") == 0) && (fname_found)) {
           val = retrieve_value(line, &j);
@@ -159,7 +153,11 @@ file_struct scan_file(string fname, file_struct fs) {
         else content += line[j];
       }
       i++;
-      if ((fname_found) && (fd_found) && (size_found) && (offset_found) && (contents_found)) break;
+      if ((fname_found) && (fd_found) && (size_found) && (offset_found) && (contents_found)) {
+        fs.fd = file_descriptor;
+        fs.operation = flag;
+        break;
+      }
     }
   }
   else {
@@ -168,19 +166,19 @@ file_struct scan_file(string fname, file_struct fs) {
   }
   f.close();
   if ((i == 0) || (fname_found == false)) {
-    ofstream ofile;
-    ofile.open(file_system, ios::out | ios::app);
-    ofile << "file name: " << fname << '\n';
-    ofile << "fd: " << file_descriptor << '\n';
-    ofile << "size: " << "0" << '\n';
-    ofile << "offset: " << "0" << '\n';
-    ofile << "contents: " << " " << '\n' << '\n';
-    ofile.close();
+    // ofstream ofile;
+    // ofile.open(file_system, ios::out | ios::app);
+    // ofile << "file name: " << fname << '\n';
+    // ofile << "size: " << "0" << '\n';
+    // ofile << "offset: " << "0" << '\n';
+    // ofile << "contents: " << " " << '\n' << '\n';
+    // ofile.close();
     fs.fname = fname;
-    fs.fd = file_descriptor;
     fs.size = "0";
     fs.offset = "0";
     fs.contents = " ";
+    fs.fd = file_descriptor;
+    fs.operation = flag;
     file_descriptor++;
   }
   return fs;

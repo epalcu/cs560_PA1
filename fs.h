@@ -12,6 +12,7 @@ class file_struct {
       string size;
       string offset;
       string contents;
+      string operation;
 };
 
 class directory {

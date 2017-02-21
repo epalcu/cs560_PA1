@@ -7,13 +7,13 @@ all: main
 commands.o: commands.cpp commands.h fs.h
 	$(CC) $(CFLAGS) -c commands.cpp
 
-utils.o: utils.cpp commands.cpp utils.h
+utils.o: utils.cpp commands.cpp utils.h commands.h
 	$(CC) $(CFLAGS) -c utils.cpp
 
 fs.o: fs.cpp fs.h
 	$(CC) $(CFLAGS) -c fs.cpp
 
-main.o: main.cpp utils.cpp fs.cpp
+main.o: main.cpp utils.cpp commands.cpp fs.cpp
 	$(CC) $(CFLAGS) -c main.cpp
 
 main: main.o utils.o fs.o
