@@ -5,7 +5,7 @@
 using namespace std;
 
 vector<file_struct> files;
-int file_descriptor = 1;
+int file_descriptor = 0;
 
 void mkfs() {
   return create_file_system();
@@ -28,13 +28,14 @@ void open(string fname, string flag) {
   }
   if (!duplicate) {
     if (flag.compare("w") == 0) {
-      new_file = scan_file(fname, new_file, flag);
+      new_file = scan_directory(fname, new_file, flag);
       files.push_back(new_file);
+      //TODO: If file does not exist in directory vector, push it into it
       cout << "SUCCESS, fd=" << new_file.fd << endl;
       return;
     }
     else if (flag.compare("r") == 0) {
-      new_file = scan_file(fname, new_file, flag);
+      new_file = scan_directory(fname, new_file, flag);
       if (new_file.size.compare("0") == 0) {
         file_descriptor--;
         cout << "File does not exist. Please open file with write flag to create file.\n";
@@ -73,7 +74,9 @@ void read(string fd, string size) {
   }
 }
 
-void write(string fd, string contents) {;}
+void write(string fd, string contents) {
+  ;
+}
 
 void seek(string fd, string offset) {;}
 

@@ -111,7 +111,7 @@ string retrieve_value(string l, int *j) {
   return v;
 }
 
-file_struct scan_file(string fname, file_struct fs, string flag) {
+file_struct scan_directory(string fname, file_struct fs, string flag) {
   ifstream f(file_system);
   string line, content, val;
   bool fname_found = false;
@@ -121,44 +121,8 @@ file_struct scan_file(string fname, file_struct fs, string flag) {
   bool contents_found = false;
   int i=0;
   if (f.is_open()) {
-    while(getline(f, line)) {
-      content = "";
-      for (int j=0; j<line.length(); j++) {
-        if (content.compare("file name: ") == 0) {
-          val = retrieve_value(line, &j);
-          if (val.compare(fname) == 0) {
-            fname_found = true;
-            fs.fname = val;
-            break;
-          }
-        }
-        else if ((content.compare("size: ") == 0) && (fname_found)) {
-          val = retrieve_value(line, &j);
-          size_found = true;
-          fs.size = val;
-          break;
-        }
-        else if ((content.compare("offset: ") == 0) && (fname_found)) {
-          val = retrieve_value(line, &j);
-          offset_found = true;
-          fs.offset = val;
-          break;
-        }
-        else if ((content.compare("contents: ") == 0) && (fname_found)) {
-          val = retrieve_value(line, &j);
-          contents_found = true;
-          fs.contents = val;
-          break;
-        }
-        else content += line[j];
-      }
-      i++;
-      if ((fname_found) && (fd_found) && (size_found) && (offset_found) && (contents_found)) {
-        fs.fd = file_descriptor;
-        fs.operation = flag;
-        break;
-      }
-    }
+    //TODO: Check vector of current directory and see if file name exists
+    // If it does, pull its info and return it, and increment its file descriptor
   }
   else {
     cout << "Unable to access file system.\n";

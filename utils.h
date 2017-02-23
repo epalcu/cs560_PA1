@@ -45,4 +45,4 @@ string retrieve_value(string l, int *j);
 // # that it has been accessed. If the desired file does not exist, it is     #
 // # simply created, with newly initialized information.                      #
 // ############################################################################
-file_struct scan_file(string fd, file_struct fs, string flag);
+file_struct scan_directory(string fd, file_struct fs, string flag);

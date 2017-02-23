@@ -20,9 +20,9 @@ int main(int argc, char* argv[]) {
       cout << "sh ";
     }
     //NOTE: Uncomment to verify opened files properly placed in files vector!!
-    for (int i=0; i<files.size(); i++) {
-      cout << files[i].fd << endl;
-    }
-    cout << files.size() << endl;
+    // for (int i=0; i<files.size(); i++) {
+    //   cout << files[i].fd << endl;
+    // }
+    // cout << files.size() << endl;
     return 0;
 }
