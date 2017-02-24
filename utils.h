@@ -46,3 +46,7 @@ string retrieve_value(string l, int *j);
 // # simply created, with newly initialized information.                      #
 // ############################################################################
 file_struct scan_directory(string fd, file_struct fs, string flag);
+
+string remove_quotes(string statement);
+
+//int check_file_existance(vector<file_struct> v, string fd, string fname);

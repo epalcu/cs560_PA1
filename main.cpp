@@ -11,13 +11,13 @@ extern int file_descriptor;
 int main(int argc, char* argv[]) {
     string cmd;
     vector<string> command;
-    cout << "sh ";
+    //cout << "sh ";
     while(getline(cin, cmd)) { // May end up being its own function and moved into utils.cpp
       if ((cmd.compare("exit()") == 0) || (cmd.compare("exit") == 0)) break;
       cmd += '\n';
       command = break_string(cmd);
       validate_and_call(command);
-      cout << "sh ";
+      //cout << "sh ";
     }
     //NOTE: Uncomment to verify opened files properly placed in files vector!!
     // for (int i=0; i<files.size(); i++) {

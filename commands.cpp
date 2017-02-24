@@ -1,10 +1,12 @@
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "commands.h"
 
 using namespace std;
 
 vector<file_struct> files;
+vector<file_struct> directory; // Dummy vector that will be replaced by vector of actual directory
 int file_descriptor = 0;
 
 void mkfs() {
@@ -30,7 +32,6 @@ void open(string fname, string flag) {
     if (flag.compare("w") == 0) {
       new_file = scan_directory(fname, new_file, flag);
       files.push_back(new_file);
-      //TODO: If file does not exist in directory vector, push it into it
       cout << "SUCCESS, fd=" << new_file.fd << endl;
       return;
     }
@@ -51,10 +52,12 @@ void open(string fname, string flag) {
 }
 
 void read(string fd, string size) {
+  bool file_found = false;
   for (int i=0; i<files.size(); i++) {
     if (files[i].fd == stoi(fd)) {
+      file_found = true;
       if (files[i].operation.compare("w") == 0) {
-        cout << "File previously opened for writing. Please close file and reopen for writing.\n";
+        cout << "File previously opened for writing. Please close file and reopen for reading.\n";
       }
       else {
         string contents = files[i].contents;
@@ -70,17 +73,77 @@ void read(string fd, string size) {
       }
       return;
     }
-    else cout << "File does not exist. Please open file with write flag to create file.\n";
   }
+  if (!file_found) cout << "File does not exist. Please open file with write flag to create file.\n";
 }
 
 void write(string fd, string contents) {
-  ;
+  bool file_found = false;
+  stringstream ss;
+  for (int i=0; i<files.size(); i++) {
+    if (files[i].fd == stoi(fd)) {
+      file_found = true;
+      if (files[i].operation.compare("r") == 0) {
+        cout << "File previously opened for reading. Please close file and reopen for writing.\n";
+      }
+      else {
+        string file_contents = files[i].contents;
+        contents = remove_quotes(contents);
+        int current_offset = stoi(files[i].offset);
+        int updated_offset = current_offset+contents.length();
+        string first_half, second_half, updated_contents;
+        int j = 0;
+        for (j=current_offset+1; j<file_contents.length(); j++) {
+          second_half += file_contents[j];
+        }
+        for (j=0; j<(current_offset); j++) {
+          first_half += file_contents[j];
+        }
+        updated_contents = first_half + contents + second_half;
+        ss << updated_contents;
+        cout << ss << endl;
+        ss >> updated_contents;
+        files[i].size = updated_contents.length();
+        files[i].offset = to_string(updated_offset);
+        files[i].contents = updated_contents;
+      }
+      return;
+    }
+  }
+  if (!file_found) cout << "File does not exist. Please open file with write flag to create file.\n";
 }
 
 void seek(string fd, string offset) {;}
 
-void close(string fd) {;}
+void close(string fd) {
+  bool file_open = false;
+  file_struct f;
+  bool file_directory = false;
+  for (int i=0; i<files.size(); i++) {
+    if (files[i].fd == stoi(fd)) {
+      f = files[i];
+      file_open = true;
+      files.erase(files.begin()+i);
+    }
+  }
+  if (file_open) {
+    for (int i=0; i<directory.size(); i++) {
+      if (directory[i].fname == f.fname) {
+        file_directory = true;
+        directory[i].fname = f.fname;
+        directory[i].size = f.size;
+        directory[i].offset = f.offset;
+        directory[i].contents = f.contents;
+        return;
+      }
+    }
+  }
+  else {
+    cout << "File does not exist. Please open file with write flag to create file.\n";
+    return;
+  }
+  if (!file_directory) directory.push_back(f);
+}
 
 void mkdir(string directory) {;}
 
@@ -90,7 +153,17 @@ void cd(string directory) {;}
 
 void ls() {;}
 
-void cat(string fname) {;}
+void cat(string fname) {
+  bool file_found = false;
+  for (int i=0; i<directory.size(); i++) {
+    if (directory[i].fname == fname) {
+      file_found = true;
+      cout << directory[i].contents << endl;
+      return;
+    }
+  }
+  if (!file_found) cout << "File does not exist. Please open file with write flag to create file.\n";
+}
 
 void tree() {;}
 

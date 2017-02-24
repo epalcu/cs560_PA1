@@ -114,29 +114,24 @@ string retrieve_value(string l, int *j) {
 file_struct scan_directory(string fname, file_struct fs, string flag) {
   ifstream f(file_system);
   string line, content, val;
-  bool fname_found = false;
-  bool fd_found = false;
-  bool size_found = false;
-  bool offset_found = false;
-  bool contents_found = false;
-  int i=0;
+  bool file_found = false;
   if (f.is_open()) {
     //TODO: Check vector of current directory and see if file name exists
     // If it does, pull its info and return it, and increment its file descriptor
+    for (int i=0; i<directory.size(); i++) {
+      if (directory[i].fname == fname) {
+        file_found = true;
+        fs = directory[i];
+        //cout << directory[i].contents << endl;
+      }
+    }
   }
   else {
     cout << "Unable to access file system.\n";
     exit(1);
   }
   f.close();
-  if ((i == 0) || (fname_found == false)) {
-    // ofstream ofile;
-    // ofile.open(file_system, ios::out | ios::app);
-    // ofile << "file name: " << fname << '\n';
-    // ofile << "size: " << "0" << '\n';
-    // ofile << "offset: " << "0" << '\n';
-    // ofile << "contents: " << " " << '\n' << '\n';
-    // ofile.close();
+  if (file_found == false) {
     fs.fname = fname;
     fs.size = "0";
     fs.offset = "0";
@@ -147,3 +142,24 @@ file_struct scan_directory(string fname, file_struct fs, string flag) {
   }
   return fs;
 }
+
+string remove_quotes(string statement) {
+  string altered;
+  for (int i=1; i<(statement.length()-1); i++) {
+    altered += statement[i];
+  }
+  return altered;
+}
+
+// int check_file_existance(vector<file_struct> v, string fd=false, string fname=false) {
+//   int not_found = -1;
+//   for (int i=0; i<v.size(); i++) {
+//     if (fd) {
+//       if (v[i].fd == stoi(fd)) return i;
+//     }
+//     else {
+//       if (v[i].fname == fname) return i;
+//     }
+//   }
+//   return not_found;
+// }
