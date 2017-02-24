@@ -79,7 +79,7 @@ void read(string fd, string size) {
 
 void write(string fd, string contents) {
   bool file_found = false;
-  stringstream ss;
+  bool new_line = false;
   for (int i=0; i<files.size(); i++) {
     if (files[i].fd == stoi(fd)) {
       file_found = true;
@@ -100,12 +100,10 @@ void write(string fd, string contents) {
           first_half += file_contents[j];
         }
         updated_contents = first_half + contents + second_half;
-        ss << updated_contents;
-        cout << ss << endl;
-        ss >> updated_contents;
         files[i].size = updated_contents.length();
         files[i].offset = to_string(updated_offset);
-        files[i].contents = updated_contents;
+        if (new_line) files[i].contents = updated_contents+'\n';
+        else files[i].contents = updated_contents;
       }
       return;
     }
@@ -158,7 +156,14 @@ void cat(string fname) {
   for (int i=0; i<directory.size(); i++) {
     if (directory[i].fname == fname) {
       file_found = true;
-      cout << directory[i].contents << endl;
+      string contents = directory[i].contents;
+      for (int j=0; j<contents.length(); j++) {
+        if ((contents[j] == '\\') && (contents[j+1] == 'n')) {
+          cout << endl;
+          j++;
+        }
+        else cout << contents[j];
+      }
       return;
     }
   }
