@@ -6,8 +6,10 @@
 using namespace std;
 
 vector<file_struct> files;
-vector<file_struct> directory; // Dummy vector that will be replaced by vector of actual directory
 int file_descriptor = 0;
+directory *current_dir = NULL;
+vector <string> path;
+int depth = 0;
 
 void mkfs() {
   return create_file_system();
@@ -115,23 +117,26 @@ void seek(string fd, string offset) {;}
 
 void close(string fd) {
   bool file_open = false;
-  file_struct f;
+  file_struct *f;
+  f = new file_struct;
   bool file_directory = false;
   for (int i=0; i<files.size(); i++) {
     if (files[i].fd == stoi(fd)) {
-      f = files[i];
+      *f = files[i];
       file_open = true;
       files.erase(files.begin()+i);
     }
   }
   if (file_open) {
-    for (int i=0; i<directory.size(); i++) {
-      if (directory[i].fname == f.fname) {
+    for (int i=0; i<current_dir->files.size(); i++) {
+      if (current_dir->files[i]->fname == f->fname) {
         file_directory = true;
-        directory[i].fname = f.fname;
-        directory[i].size = f.size;
-        directory[i].offset = f.offset;
-        directory[i].contents = f.contents;
+        current_dir->files[i]->fname = f->fname;
+        current_dir->files[i]->size = f->size;
+        current_dir->files[i]->offset = f->offset;
+        current_dir->files[i]->contents = f->contents;
+		current_dir->files[i]->size = f->size;
+		current_dir->files[i]->date = f->date;
         return;
       }
     }
@@ -140,23 +145,86 @@ void close(string fd) {
     cout << "File does not exist. Please open file with write flag to create file.\n";
     return;
   }
-  if (!file_directory) directory.push_back(f);
+  if (!file_directory) current_dir->files.push_back(f);
 }
 
-void mkdir(string directory) {;}
+void mkdir(string dname) {
+	directory *dir;
 
-void rmdir(string directory) {;}
+	dir = new directory;
+	dir->name = dname;
+	dir->parent_dir = current_dir;
+	dir->size = 0;
 
-void cd(string directory) {;}
+	current_dir->sub_dirs.push_back(dir);
+}
 
-void ls() {;}
+void rmdir(string dname) {
+	int i, j;
+	directory *tmpdir = NULL;
+
+	//Check if specified directory exists
+	for(i = 0; i < current_dir->sub_dirs.size(); i++) {
+		//Specified directory was found, move into that directory
+		if(current_dir->sub_dirs[i]->name == dname) {
+			current_dir = current_dir->sub_dirs[i];
+
+			//Recursively remove all subdirectories within specified directory
+			for(j = 0; j < current_dir->sub_dirs.size(); j++) {
+				rmdir(current_dir->sub_dirs[j]->name);
+			}
+
+			//Delete all files in specified directory
+			for(j = 0; j < current_dir->files.size(); j++) {
+				delete current_dir->files[j];
+			}
+
+			//Finally, delete specified directory
+			tmpdir = current_dir;
+			current_dir = current_dir->parent_dir;
+			current_dir->sub_dirs.erase(current_dir->sub_dirs.begin()+i);
+			delete tmpdir;
+
+			return;
+		}
+	}
+
+	//Specified directory was not found
+	cout << "Directory does not exist." << endl;
+	return;
+}
+
+void cd(string dname) {
+	int i;
+
+	if(dname == ".." && current_dir->parent_dir != NULL) {
+		path.pop_back();
+		current_dir = current_dir->parent_dir;
+		return;
+	}
+
+	for(i = 0; i < current_dir->sub_dirs.size(); i++) {
+		if(current_dir->sub_dirs[i]->name == dname) {
+			path.push_back(dname);
+			current_dir = current_dir->sub_dirs[i];
+			return;
+		}
+	}
+
+	cout << "Directory does not exist." << endl;
+	return;
+}
+
+void ls() {
+	print_directory_contents();
+}
 
 void cat(string fname) {
   bool file_found = false;
-  for (int i=0; i<directory.size(); i++) {
-    if (directory[i].fname == fname) {
+  for (int i=0; i<current_dir->files.size(); i++) {
+    if (current_dir->files[i]->fname == fname) {
       file_found = true;
-      string contents = directory[i].contents;
+      string contents = current_dir->files[i]->contents;
       for (int j=0; j<contents.length(); j++) {
         if ((contents[j] == '\\') && (contents[j+1] == 'n')) {
           cout << endl;
@@ -170,7 +238,45 @@ void cat(string fname) {
   if (!file_found) cout << "File does not exist. Please open file with write flag to create file.\n";
 }
 
-void tree() {;}
+void tree() {
+	int i, j;
+
+	if(depth != 0) {
+		for(i = 0; i < depth-1; i++) {
+			cout << "    ";
+		}
+
+		cout << "|" << endl;
+	}
+
+	for(i = 0; i < depth; i++) {
+		if(i == depth-1) cout << "----";
+		else cout << "    ";
+	}
+
+	cout << current_dir->name << endl;
+
+	//Recursively call tree on all subdirectories
+	for(i = 0; i < current_dir->sub_dirs.size(); i++) {
+		depth++;
+		current_dir = current_dir->sub_dirs[i];
+		tree();
+		current_dir = current_dir->parent_dir;
+		depth--;
+	}
+
+	//Print files
+	for(i = 0; i < current_dir->files.size(); i++) {
+		for(j = 0; j < depth+1; j++) {
+			if(j == depth) cout << "----";
+			else cout << "    ";
+		}
+
+		cout << current_dir->files[i]->fname << "    "
+			 << "size: " << current_dir->files[i]->size << "    "
+			 << "created: " << current_dir->files[i]->date << endl;
+	}
+}
 
 void import_file(string source, string destination) {;}
 

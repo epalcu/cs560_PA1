@@ -49,4 +49,6 @@ file_struct scan_directory(string fd, file_struct fs, string flag);
 
 string remove_quotes(string statement);
 
+void print_directory_contents();
+
 //int check_file_existance(vector<file_struct> v, string fd, string fname);

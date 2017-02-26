@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -g -O -Wall
+CFLAGS = -g -O -std=c++11
 BIN = main.o commands.o utils.o fs.o
 
 all: main

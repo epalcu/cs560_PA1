@@ -13,12 +13,14 @@ class file_struct {
       string offset;
       string contents;
       string operation;
+	  string date;
 };
 
 class directory {
     public:
-        vector<directory *> parent_dirs;
+        directory *parent_dir;
         vector<file_struct *> files;
         vector<directory *> sub_dirs;
         int size;
+		string name;
 };
