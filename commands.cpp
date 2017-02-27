@@ -39,7 +39,7 @@ void open(string fname, string flag) {
     }
     else if (flag.compare("r") == 0) {
       new_file = scan_directory(fname, new_file, flag);
-      if (new_file.size.compare("0") == 0) {
+      if (new_file.size == 0) {
         file_descriptor--;
         cout << "File does not exist. Please open file with write flag to create file.\n";
       }
@@ -63,7 +63,7 @@ void read(string fd, string size) {
       }
       else {
         string contents = files[i].contents;
-        int current_offset = stoi(files[i].offset);
+        int current_offset = files[i].offset;
         int updated_offset = current_offset+stoi(size);
         string output;
         int j = 0;
@@ -91,7 +91,7 @@ void write(string fd, string contents) {
       else {
         string file_contents = files[i].contents;
         contents = remove_quotes(contents);
-        int current_offset = stoi(files[i].offset);
+        int current_offset = files[i].offset;
         int updated_offset = current_offset+contents.length();
         string first_half, second_half, updated_contents;
         int j = 0;
@@ -103,7 +103,7 @@ void write(string fd, string contents) {
         }
         updated_contents = first_half + contents + second_half;
         files[i].size = updated_contents.length();
-        files[i].offset = to_string(updated_offset);
+        files[i].offset = updated_offset;
         if (new_line) files[i].contents = updated_contents+'\n';
         else files[i].contents = updated_contents;
       }
@@ -120,6 +120,7 @@ void close(string fd) {
   file_struct *f;
   f = new file_struct;
   bool file_directory = false;
+  // Traverse open files vector; if desired file is open, remove it from vector
   for (int i=0; i<files.size(); i++) {
     if (files[i].fd == stoi(fd)) {
       *f = files[i];
@@ -127,6 +128,7 @@ void close(string fd) {
       files.erase(files.begin()+i);
     }
   }
+  // If file exists in directory vector of files, simply update its contents
   if (file_open) {
     for (int i=0; i<current_dir->files.size(); i++) {
       if (current_dir->files[i]->fname == f->fname) {
@@ -145,6 +147,7 @@ void close(string fd) {
     cout << "File does not exist. Please open file with write flag to create file.\n";
     return;
   }
+  // If file does not exist in directory vector of files, push it on
   if (!file_directory) current_dir->files.push_back(f);
 }
 
