@@ -9,11 +9,12 @@ class file_struct {
     public:
       string fname;
       int fd;
-      string size;
-      string offset;
+      int size;
+      int offset;
       string contents;
       string operation;
-	  string date;
+	    string date;
+      vector<string> path;
 };
 
 class directory {

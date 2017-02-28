@@ -45,7 +45,7 @@ void print_path() {
 	for(i = 0; i < path.size(); i++) {
 		cout << "/" << path[i];
 	}
-	
+
 	cout << "> ";
 }
 
@@ -64,7 +64,7 @@ void validate_and_call(vector<string> cmd) {
     if (size == 3) {
 		if(current_dir == NULL) print_fs_error();
 		else open(cmd[1], cmd[2]);
-			
+
 		print_path();
 		return;
 	}
@@ -84,7 +84,7 @@ void validate_and_call(vector<string> cmd) {
     if (size == 3) {
 		if(current_dir == NULL) print_fs_error();
 		else write(cmd[1], cmd[2]);
-		
+
 		print_path();
 		return;
 	}
@@ -94,7 +94,7 @@ void validate_and_call(vector<string> cmd) {
     if (size == 3) {
 		if(current_dir == NULL) print_fs_error();
 		else seek(cmd[1], cmd[2]);
-		
+
 		print_path();
 		return;
 	}
@@ -104,7 +104,7 @@ void validate_and_call(vector<string> cmd) {
     if (size == 2) {
 		if(current_dir == NULL) print_fs_error();
 		else close(cmd[1]);
-		
+
 		print_path();
 		return;
 	}
@@ -114,7 +114,7 @@ void validate_and_call(vector<string> cmd) {
     if (size == 2) {
 		if(current_dir == NULL) print_fs_error();
 		else mkdir(cmd[1]);
-		
+
 		print_path();
 		return;
 	}
@@ -124,7 +124,7 @@ void validate_and_call(vector<string> cmd) {
     if (size == 2) {
 		if(current_dir == NULL) print_fs_error();
 		else rmdir(cmd[1]);
-		
+
 		print_path();
 		return;
 	}
@@ -134,7 +134,7 @@ void validate_and_call(vector<string> cmd) {
     if (size == 2) {
 		if(current_dir == NULL) print_fs_error();
 		else cd(cmd[1]);
-		
+
 		print_path();
 		return;
 	}
@@ -144,7 +144,7 @@ void validate_and_call(vector<string> cmd) {
     if (size == 1) {
 		if(current_dir == NULL) print_fs_error();
 		else ls();
-		
+
 		print_path();
 		return;
 	}
@@ -154,7 +154,7 @@ void validate_and_call(vector<string> cmd) {
     if (size == 2) {
 		if(current_dir == NULL) print_fs_error();
 		else cat(cmd[1]);
-		
+
 		print_path();
 		return;
 	}
@@ -164,7 +164,7 @@ void validate_and_call(vector<string> cmd) {
     if (size == 1) {
 		if(current_dir == NULL) print_fs_error();
 		else tree();
-		
+
 		print_path();
 		return;
 	}
@@ -174,7 +174,7 @@ void validate_and_call(vector<string> cmd) {
     if (size == 3) {
 		if(current_dir == NULL) print_fs_error();
 		else import_file(cmd[1], cmd[2]);
-		
+
 		print_path();
 		return;
 	}
@@ -184,7 +184,7 @@ void validate_and_call(vector<string> cmd) {
     if (size == 3) {
 		if(current_dir == NULL) print_fs_error();
 		else export_file(cmd[1], cmd[2]);
-		
+
 		print_path();
 		return;
 	}
@@ -221,34 +221,25 @@ string retrieve_value(string l, int *j) {
 }
 
 file_struct scan_directory(string fname, file_struct fs, string flag) {
-  ifstream f(file_system);
   string line, content, val;
   bool file_found = false;
-  if (f.is_open()) {
-    //TODO: Check vector of current directory and see if file name exists
-    // If it does, pull its info and return it, and increment its file descriptor
-    for (int i=0; i<current_dir->files.size(); i++) {
-      if (current_dir->files[i]->fname == fname) {
-        file_found = true;
-        fs = *current_dir->files[i];
-        //cout << current_dir->files[i]->contents << endl;
-      }
+  for (int i=0; i<current_dir->files.size(); i++) {
+    if (current_dir->files[i]->fname == fname) {
+      file_found = true;
+      fs = *current_dir->files[i];
+      //cout << current_dir->files[i]->contents << endl;
     }
   }
-  else {
-    cout << "Unable to access file system.\n";
-    exit(1);
-  }
-  f.close();
   if (file_found == false) {
     fs.fname = fname;
-    fs.size = "0";
-    fs.offset = "0";
-	time_t now = time(0);
-	fs.date = ctime(&now);
+    fs.size = 0;
+    fs.offset = 0;
+	  time_t now = time(0);
+	  fs.date = ctime(&now);
     fs.contents = " ";
     fs.fd = file_descriptor;
     fs.operation = flag;
+    fs.path = path;
     file_descriptor++;
   }
   return fs;
