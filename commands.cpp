@@ -149,14 +149,37 @@ void close(string fd) {
 }
 
 void mkdir(string dname) {
-	directory *dir;
+	directory *dir, *tmpdir, *top_dir;
+	vector<string> *spath;
+	spath = new vector<string>;
+	int i, j;
+	bool dir_exists = false;
 
-	dir = new directory;
-	dir->name = dname;
-	dir->parent_dir = current_dir;
-	dir->size = 0;
+	split_path(dname, spath);
 
-	current_dir->sub_dirs.push_back(dir);
+	top_dir = current_dir;
+	for(i = 0; i < spath->size(); i++) {
+		for(j = 0; j < current_dir->sub_dirs.size(); j++) {
+			if(current_dir->sub_dirs[j]->name == (*spath)[i]) {
+				dir_exists = true;
+				tmpdir = current_dir->sub_dirs[i];
+				break;
+			}
+		}
+
+		if(dir_exists == false) {
+			dir = new directory;
+			dir->name = (*spath)[i];
+			dir->parent_dir = current_dir;
+			dir->size = 0;
+			current_dir->sub_dirs.push_back(dir);
+			current_dir = dir;
+		} else current_dir = tmpdir;
+
+		dir_exists = false;
+	}
+
+	current_dir = top_dir;
 }
 
 void rmdir(string dname) {
@@ -195,24 +218,38 @@ void rmdir(string dname) {
 }
 
 void cd(string dname) {
-	int i;
+	int i, j;
+	vector<string> *spath;
+	bool found = false;
 
-	if(dname == ".." && current_dir->parent_dir != NULL) {
-		path.pop_back();
-		current_dir = current_dir->parent_dir;
-		return;
-	}
+	spath = new vector<string>;
 
-	for(i = 0; i < current_dir->sub_dirs.size(); i++) {
-		if(current_dir->sub_dirs[i]->name == dname) {
-			path.push_back(dname);
-			current_dir = current_dir->sub_dirs[i];
+	split_path(dname, spath);
+
+	for(i = 0; i < spath->size(); i++) {
+		if((*spath)[i] == ".." && current_dir->parent_dir != NULL) {
+			path.pop_back();
+			current_dir = current_dir->parent_dir;
+			found = true;
+		} else {
+			for(j = 0; j < current_dir->sub_dirs.size(); j++) {
+				if(current_dir->sub_dirs[j]->name == (*spath)[i]) {
+					path.push_back((*spath)[i]);
+					current_dir = current_dir->sub_dirs[j];
+					found = true;
+					break;
+				}
+			}
+
+		}
+
+		if(found == false) {
+			cout << "Directory does not exist." << endl;
 			return;
 		}
-	}
 
-	cout << "Directory does not exist." << endl;
-	return;
+		found = false;
+	}
 }
 
 void ls() {

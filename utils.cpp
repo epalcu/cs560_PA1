@@ -263,10 +263,6 @@ string remove_quotes(string statement) {
 }
 
 void print_directory_contents() {
-	cout << "." << endl;
-
-	if(current_dir->parent_dir != NULL) cout << ".." << endl;
-
 	//Print subdirectories
 	for(int i=0; i < current_dir->sub_dirs.size(); i++) {
 		cout << current_dir->sub_dirs[i]->name << endl;
@@ -280,6 +276,22 @@ void print_directory_contents() {
 	//Print open files
 	for(int i = 0; i < files.size(); i++) {
 		cout << files[i].fname << endl;
+	}
+}
+
+void split_path(string path, vector<string> *spath) {
+	size_t index;
+	string tmpstr1, tmpstr2;
+
+	index = path.find('/');
+	if(index != string::npos) {
+		tmpstr1 = path.substr(0, index);
+		spath->push_back(tmpstr1);
+		tmpstr2 = path.substr(index+1);
+		split_path(tmpstr2, spath);
+	} else {
+		spath->push_back(path);
+		return;
 	}
 }
 
