@@ -51,4 +51,6 @@ string remove_quotes(string statement);
 
 void print_directory_contents();
 
+void split_path(string path, vector<string> *spath);
+
 //int check_file_existance(vector<file_struct> v, string fd, string fname);

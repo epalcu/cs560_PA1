@@ -55,142 +55,147 @@ void validate_and_call(vector<string> cmd) {
   if (cmd[0].compare("mkfs") == 0) {
     if (size == 1) {
 		mkfs();
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: mkfs");
+    else invalid_cmd(cmd[0], "Usage: mkfs");
+  
+	print_path();
+	return;
   }
   else if (cmd[0].compare("open") == 0) {
     if (size == 3) {
 		if(current_dir == NULL) print_fs_error();
 		else open(cmd[1], cmd[2]);
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: open [filename] [flag]");
+    else invalid_cmd(cmd[0], "Usage: open [filename] [flag]");
+ 
+	print_path();
+	return;
   }
   else if (cmd[0].compare("read") == 0) {
     if (size == 3) {
 		if(current_dir == NULL) print_fs_error();
 		else read(cmd[1], cmd[2]);
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: read [fd] [size]");
+    else invalid_cmd(cmd[0], "Usage: read [fd] [size]");
+  
+	print_path();
+	return;
   }
   else if (cmd[0].compare("write") == 0) {
     if (size == 3) {
 		if(current_dir == NULL) print_fs_error();
 		else write(cmd[1], cmd[2]);
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: write [fd] [string]");
+    else invalid_cmd(cmd[0], "Usage: write [fd] [string]");
+
+	print_path();
+	return;
   }
   else if (cmd[0].compare("seek") == 0) {
     if (size == 3) {
 		if(current_dir == NULL) print_fs_error();
 		else seek(cmd[1], cmd[2]);
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: seek [fd] [offset]");
+    else invalid_cmd(cmd[0], "Usage: seek [fd] [offset]");
+  
+	print_path();
+	return;
   }
   else if (cmd[0].compare("close") == 0) {
     if (size == 2) {
 		if(current_dir == NULL) print_fs_error();
 		else close(cmd[1]);
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: close [fd]");
+    else invalid_cmd(cmd[0], "Usage: close [fd]");
+  
+	print_path();
+	return;
   }
   else if (cmd[0].compare("mkdir") == 0) {
     if (size == 2) {
 		if(current_dir == NULL) print_fs_error();
 		else mkdir(cmd[1]);
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: mkdir [dirname]");
+    else invalid_cmd(cmd[0], "Usage: mkdir [dirname]");
+  
+	print_path();
+	return;
   }
   else if (cmd[0].compare("rmdir") == 0) {
     if (size == 2) {
 		if(current_dir == NULL) print_fs_error();
 		else rmdir(cmd[1]);
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: rmdir [dirname]");
+    else invalid_cmd(cmd[0], "Usage: rmdir [dirname]");
+  
+	print_path();
+	return;
   }
   else if (cmd[0].compare("cd") == 0) {
     if (size == 2) {
 		if(current_dir == NULL) print_fs_error();
 		else cd(cmd[1]);
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: cd [dirname]");
+    else invalid_cmd(cmd[0], "Usage: cd [dirname]");
+  
+	print_path();
+	return;
   }
   else if (cmd[0].compare("ls") == 0) {
     if (size == 1) {
 		if(current_dir == NULL) print_fs_error();
 		else ls();
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: ls");
+    else invalid_cmd(cmd[0], "Usage: ls");
+  
+	print_path();
+	return;
   }
   else if (cmd[0].compare("cat") == 0) {
     if (size == 2) {
 		if(current_dir == NULL) print_fs_error();
 		else cat(cmd[1]);
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: cat [filename]");
+    else invalid_cmd(cmd[0], "Usage: cat [filename]");
+  
+	print_path();
+	return;
   }
   else if (cmd[0].compare("tree") == 0) {
     if (size == 1) {
 		if(current_dir == NULL) print_fs_error();
 		else tree();
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: tree");
+    else invalid_cmd(cmd[0], "Usage: tree");
+	
+	print_path();
+	return;
   }
   else if (cmd[0].compare("import") == 0) {
     if (size == 3) {
 		if(current_dir == NULL) print_fs_error();
 		else import_file(cmd[1], cmd[2]);
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: import [srcname] [dstname]");
+    else invalid_cmd(cmd[0], "Usage: import [srcname] [dstname]");
+	
+	print_path();
+	return;
   }
   else if (cmd[0].compare("export") == 0) {
     if (size == 3) {
 		if(current_dir == NULL) print_fs_error();
 		else export_file(cmd[1], cmd[2]);
-
-		print_path();
-		return;
 	}
-    else return invalid_cmd(cmd[0], "Usage: export [srcname] [dstname]");
+    else invalid_cmd(cmd[0], "Usage: export [srcname] [dstname]");
+		
+	print_path();
+	return;
   }
-  else return invalid_cmd(cmd[0], usage);
+  else {
+	  invalid_cmd(cmd[0], usage);
+	  print_path();
+	  return;
+  }
 }
 
 void create_file_system() {
@@ -252,8 +257,8 @@ file_struct scan_directory(string fname, file_struct fs, string flag) {
     fs.fname = fname;
     fs.size = 0;
     fs.offset = 0;
-	  time_t now = time(0);
-	  fs.date = ctime(&now);
+	time_t now = time(0);
+	fs.date = ctime(&now);
     fs.contents = " ";
     fs.operation = flag;
     fs.path = path;
@@ -274,10 +279,6 @@ string remove_quotes(string statement) {
 }
 
 void print_directory_contents() {
-	cout << "." << endl;
-
-	if(current_dir->parent_dir != NULL) cout << ".." << endl;
-
 	//Print subdirectories
 	for(int i=0; i < current_dir->sub_dirs.size(); i++) {
 		cout << current_dir->sub_dirs[i]->name << endl;
@@ -290,7 +291,25 @@ void print_directory_contents() {
 
 	//Print open files
 	for(int i = 0; i < files.size(); i++) {
-		cout << files[i].fname << endl;
+		if(path == files[i].path) {
+			cout << files[i].fname << endl;
+		}
+	}
+}
+
+void split_path(string path, vector<string> *spath) {
+	size_t index;
+	string tmpstr1, tmpstr2;
+
+	index = path.find('/');
+	if(index != string::npos) {
+		tmpstr1 = path.substr(0, index);
+		spath->push_back(tmpstr1);
+		tmpstr2 = path.substr(index+1);
+		split_path(tmpstr2, spath);
+	} else {
+		spath->push_back(path);
+		return;
 	}
 }
 
