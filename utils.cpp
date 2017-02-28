@@ -201,6 +201,7 @@ void validate_and_call(vector<string> cmd) {
 
 void create_file_system() {
   directory *dir;
+  ofstream ofile;
 
   //Must delete any previous file system
   if(home_dir != NULL) {
@@ -238,7 +239,8 @@ void create_file_system() {
     //Update path
     path.push_back(current_dir->name);
   }
-
+  ofile.open(file_system);
+  ofile.close();
   return;
 }
 
