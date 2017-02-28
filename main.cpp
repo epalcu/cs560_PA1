@@ -11,7 +11,7 @@ extern int file_descriptor;
 int main(int argc, char* argv[]) {
     string cmd;
     vector<string> command;
-    cout << "> ";
+    //cout << "> ";
     while(getline(cin, cmd)) { // May end up being its own function and moved into utils.cpp
       if ((cmd.compare("exit()") == 0) || (cmd.compare("exit") == 0)) break;
       cmd += '\n';

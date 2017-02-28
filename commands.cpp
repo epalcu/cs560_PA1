@@ -11,6 +11,7 @@ vector<file_struct> files;
 int file_descriptor = 0;
 vector<int> fd_list;
 directory *current_dir = NULL;
+directory *home_dir = NULL;
 vector <string> path;
 int depth = 0;
 
@@ -67,7 +68,7 @@ void read(string fd, string size) {
       else {
         string contents = files[i].contents;
         int current_offset = files[i].offset;
-        int updated_offset = current_offset+stoi(size);
+        int updated_offset = stoi(size)+current_offset;
         string output;
         int j = 0;
         for (j=current_offset; j<updated_offset; j++) {
@@ -129,7 +130,7 @@ void seek(string fd, string offset) {
   for (int i=0; i<files.size(); i++) {
     if (files[i].fd == stoi(fd)) {
       file_found = true;
-      files[i].offset = stoi(offset);
+      files[i].offset = stoi(offset)-1;
       return;
     }
   }
@@ -157,11 +158,11 @@ void close(string fd) {
         file_directory = true;
         current_dir->files[i]->fname = f->fname;
         current_dir->files[i]->size = f->size;
-        current_dir->files[i]->offset = f->offset;
+        current_dir->files[i]->offset = 0;
         current_dir->files[i]->contents = f->contents;
 		    current_dir->files[i]->size = f->size;
 		    current_dir->files[i]->date = f->date;
-        return;
+        return write_file_system();
       }
     }
   }
@@ -170,7 +171,10 @@ void close(string fd) {
     return;
   }
   // If file does not exist in directory vector of files, push it on
-  if (!file_directory) current_dir->files.push_back(f);
+  if (!file_directory) {
+    current_dir->files.push_back(f);
+    return write_file_system();
+  }
 }
 
 void mkdir(string dname) {
@@ -226,6 +230,7 @@ void rmdir(string dname) {
 			//Delete all closed files in specified directory
 			for(j = 0; j < current_dir->files.size(); j++) {
 				delete current_dir->files[j];
+        current_dir->files.erase(current_dir->files.begin()+j);
 			}
 
 			//Delete all open files in specified directory

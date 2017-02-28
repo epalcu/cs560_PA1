@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <ctime>
+#include <sstream>
 #include "utils.h"
 #include "commands.cpp"
 
@@ -43,10 +44,10 @@ void print_path() {
 	int i;
 
 	for(i = 0; i < path.size(); i++) {
-		cout << "/" << path[i];
+		//cout << "/" << path[i];
 	}
 
-	cout << "> ";
+	//cout << "> ";
 }
 
 void validate_and_call(vector<string> cmd) {
@@ -57,7 +58,7 @@ void validate_and_call(vector<string> cmd) {
 		mkfs();
 	}
     else invalid_cmd(cmd[0], "Usage: mkfs");
-  
+
 	print_path();
 	return;
   }
@@ -67,7 +68,7 @@ void validate_and_call(vector<string> cmd) {
 		else open(cmd[1], cmd[2]);
 	}
     else invalid_cmd(cmd[0], "Usage: open [filename] [flag]");
- 
+
 	print_path();
 	return;
   }
@@ -77,7 +78,7 @@ void validate_and_call(vector<string> cmd) {
 		else read(cmd[1], cmd[2]);
 	}
     else invalid_cmd(cmd[0], "Usage: read [fd] [size]");
-  
+
 	print_path();
 	return;
   }
@@ -97,7 +98,7 @@ void validate_and_call(vector<string> cmd) {
 		else seek(cmd[1], cmd[2]);
 	}
     else invalid_cmd(cmd[0], "Usage: seek [fd] [offset]");
-  
+
 	print_path();
 	return;
   }
@@ -107,7 +108,7 @@ void validate_and_call(vector<string> cmd) {
 		else close(cmd[1]);
 	}
     else invalid_cmd(cmd[0], "Usage: close [fd]");
-  
+
 	print_path();
 	return;
   }
@@ -117,7 +118,7 @@ void validate_and_call(vector<string> cmd) {
 		else mkdir(cmd[1]);
 	}
     else invalid_cmd(cmd[0], "Usage: mkdir [dirname]");
-  
+
 	print_path();
 	return;
   }
@@ -127,7 +128,7 @@ void validate_and_call(vector<string> cmd) {
 		else rmdir(cmd[1]);
 	}
     else invalid_cmd(cmd[0], "Usage: rmdir [dirname]");
-  
+
 	print_path();
 	return;
   }
@@ -137,7 +138,7 @@ void validate_and_call(vector<string> cmd) {
 		else cd(cmd[1]);
 	}
     else invalid_cmd(cmd[0], "Usage: cd [dirname]");
-  
+
 	print_path();
 	return;
   }
@@ -147,7 +148,7 @@ void validate_and_call(vector<string> cmd) {
 		else ls();
 	}
     else invalid_cmd(cmd[0], "Usage: ls");
-  
+
 	print_path();
 	return;
   }
@@ -157,7 +158,7 @@ void validate_and_call(vector<string> cmd) {
 		else cat(cmd[1]);
 	}
     else invalid_cmd(cmd[0], "Usage: cat [filename]");
-  
+
 	print_path();
 	return;
   }
@@ -167,7 +168,7 @@ void validate_and_call(vector<string> cmd) {
 		else tree();
 	}
     else invalid_cmd(cmd[0], "Usage: tree");
-	
+
 	print_path();
 	return;
   }
@@ -177,7 +178,7 @@ void validate_and_call(vector<string> cmd) {
 		else import_file(cmd[1], cmd[2]);
 	}
     else invalid_cmd(cmd[0], "Usage: import [srcname] [dstname]");
-	
+
 	print_path();
 	return;
   }
@@ -187,7 +188,7 @@ void validate_and_call(vector<string> cmd) {
 		else export_file(cmd[1], cmd[2]);
 	}
     else invalid_cmd(cmd[0], "Usage: export [srcname] [dstname]");
-		
+
 	print_path();
 	return;
   }
@@ -201,18 +202,43 @@ void validate_and_call(vector<string> cmd) {
 void create_file_system() {
   directory *dir;
 
-  dir = new directory;
-  dir->parent_dir = NULL;
-  dir->size = 0;
-  dir->name = "home";
-  current_dir = dir;
+  //Must delete any previous file system
+  if(home_dir != NULL) {
+    current_dir = home_dir;
+    path.clear();
+    path.push_back(current_dir->name);
 
-  //Update path
-  path.push_back(current_dir->name);
+    //Delete all subdirectories in home directory
+    for(int i = 0; i < current_dir->sub_dirs.size(); i++) {
+      rmdir(current_dir->sub_dirs[i]->name);
+    }
 
-  ofstream ofile;
-  ofile.open(file_system);
-  ofile.close();
+    //Delete all closed files in specified directory
+    for(int j = 0; j < current_dir->files.size(); j++) {
+      delete current_dir->files[j];
+      current_dir->files.erase(current_dir->files.begin()+j);
+    }
+
+    //Delete all open files in specified directory
+    for(int j = 0; j < files.size(); j++) {
+      if(path == files[j].path) {
+        files.erase(files.begin()+j);
+      }
+    }
+
+    current_dir->size = 0;
+  } else {
+    dir = new directory;
+    dir->parent_dir = NULL;
+    dir->size = 0;
+    dir->name = "home";
+    current_dir = dir;
+    home_dir = dir;
+
+    //Update path
+    path.push_back(current_dir->name);
+  }
+
   return;
 }
 
@@ -313,15 +339,44 @@ void split_path(string path, vector<string> *spath) {
 	}
 }
 
-// int check_file_existance(vector<file_struct> v, string fd=false, string fname=false) {
-//   int not_found = -1;
-//   for (int i=0; i<v.size(); i++) {
-//     if (fd) {
-//       if (v[i].fd == stoi(fd)) return i;
-//     }
-//     else {
-//       if (v[i].fname == fname) return i;
-//     }
-//   }
-//   return not_found;
-// }
+void recursive_write(ostream &ofile) {
+  //Recursively traverse through directory tree
+  for(int i = 0; i < current_dir->sub_dirs.size(); i++) {
+      current_dir = current_dir->sub_dirs[i];
+      path.push_back(current_dir->name);
+      recursive_write(ofile);
+      path.pop_back();
+      current_dir = current_dir->parent_dir;
+  }
+
+  //Read out closed files
+  for(int i = 0; i < current_dir->files.size(); i++) {
+    ofile << "File Name: " << current_dir->files[i]->fname << endl;
+    ofile << "File Size: " << current_dir->files[i]->size << endl;
+    ofile << "File Offset: " << current_dir->files[i]->offset << endl;
+    ofile << "File Contents: " << current_dir->files[i]->contents << endl;
+    ofile << "File Path: ";
+    for (int j=0; j<current_dir->files[i]->path.size(); j++) {
+      ofile << "/" << current_dir->files[i]->path[j];
+    }
+    ofile << endl << endl;
+  }
+}
+
+void write_file_system() {
+  directory *tmpdir;
+  vector<string> tmpvec;
+  ofstream ofile;
+  ofile.open(file_system);
+
+  tmpdir = current_dir;
+  tmpvec = path;
+  current_dir = home_dir;
+  path.clear();
+  path.push_back(current_dir->name);
+  recursive_write(ofile);
+  current_dir = tmpdir;
+  path = tmpvec;
+
+  ofile.close();
+}

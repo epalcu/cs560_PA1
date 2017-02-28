@@ -53,4 +53,6 @@ void print_directory_contents();
 
 void split_path(string path, vector<string> *spath);
 
-//int check_file_existance(vector<file_struct> v, string fd, string fname);
+void recursive_write(ostream &ofile);
+
+void write_file_system();
