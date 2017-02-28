@@ -193,6 +193,7 @@ void rmdir(string dname) {
 	for(i = 0; i < current_dir->sub_dirs.size(); i++) {
 		//Specified directory was found, move into that directory
 		if(current_dir->sub_dirs[i]->name == dname) {
+			path.push_back(current_dir->sub_dirs[i]->name);
 			current_dir = current_dir->sub_dirs[i];
 
 			//Recursively remove all subdirectories within specified directory
@@ -200,14 +201,22 @@ void rmdir(string dname) {
 				rmdir(current_dir->sub_dirs[j]->name);
 			}
 
-			//Delete all files in specified directory
+			//Delete all closed files in specified directory
 			for(j = 0; j < current_dir->files.size(); j++) {
 				delete current_dir->files[j];
+			}
+
+			//Delete all open files in specified directory
+			for(j = 0; j < files.size(); j++) {
+				if(path == files[j].path) {
+					files.erase(files.begin()+j);
+				}
 			}
 
 			//Finally, delete specified directory
 			tmpdir = current_dir;
 			current_dir = current_dir->parent_dir;
+			path.pop_back();
 			current_dir->sub_dirs.erase(current_dir->sub_dirs.begin()+i);
 			delete tmpdir;
 
@@ -243,7 +252,6 @@ void cd(string dname) {
 					break;
 				}
 			}
-
 		}
 
 		if(found == false) {
@@ -299,22 +307,50 @@ void tree() {
 	//Recursively call tree on all subdirectories
 	for(i = 0; i < current_dir->sub_dirs.size(); i++) {
 		depth++;
+		path.push_back(current_dir->sub_dirs[i]->name);
 		current_dir = current_dir->sub_dirs[i];
 		tree();
 		current_dir = current_dir->parent_dir;
+		path.pop_back();
 		depth--;
 	}
 
-	//Print files
+	//Print closed files
 	for(i = 0; i < current_dir->files.size(); i++) {
+		for(j = 0; j < depth; j++) {
+			cout << "    ";
+		}
+
+		cout << "|" << endl;
+
 		for(j = 0; j < depth+1; j++) {
 			if(j == depth) cout << "----";
 			else cout << "    ";
 		}
 
 		cout << current_dir->files[i]->fname << "    "
-			 << "size: " << current_dir->files[i]->size << "    "
+			 << "size: " << current_dir->files[i]->size << " bytes" << "    "
 			 << "created: " << current_dir->files[i]->date << endl;
+	}
+
+	//Print open files
+	for(i = 0; i < files.size(); i++) {
+		if(path == files[i].path) {
+			for(j = 0; j < depth; j++) {
+				cout << "    ";
+			}
+
+			cout << "|" << endl;
+
+			for(j = 0; j < depth+1; j++) {
+				if(j == depth) cout << "----";
+				else cout << "    ";
+			}
+
+			cout << files[i].fname << "    "
+				 << "size: " << files[i].size << " bytes" << "    "
+				 << "created: " << files[i].date << endl;
+		}
 	}
 }
 
