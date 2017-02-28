@@ -13,7 +13,7 @@ class file_struct {
       int offset;
       string contents;
       string operation;
-	  string date;
+	    string date;
       vector<string> path;
 };
 

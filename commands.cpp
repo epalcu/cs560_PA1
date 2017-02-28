@@ -103,17 +103,19 @@ void write(string fd, string contents) {
           updated_contents = contents;
         }
         else {
-          // Gather second half contents after the offset
-          for (int j=current_offset; j<file_contents.length(); j++) {
-            second_half += file_contents[j];
-          }
+          updated_offset = contents.length()+current_offset;
           // Gather the first half contents preceding the offset
           for (int j=0; j<current_offset; j++) {
             first_half += file_contents[j];
           }
-          //Update contents by adding in first half of contents, written contents, and second half of contents
-          updated_contents = first_half + contents + second_half;
-          updated_offset = current_offset+contents.length();
+          // Update the contents by concatenating the ifrst half of origin alcontents and new contents
+          updated_contents = first_half + contents;
+          // Update contents if newly created contents shorter than previous content amount
+          if (updated_offset < file_contents.length()) {
+            for (int j=updated_offset; j<file_contents.length(); j++) {
+              updated_contents += file_contents[j];
+            }
+          }
         }
         files[i].offset = updated_offset;
         files[i].size = updated_contents.length();
@@ -172,6 +174,7 @@ void close(string fd) {
   }
   // If file does not exist in directory vector of files, push it on
   if (!file_directory) {
+    f->offset = 0;
     current_dir->files.push_back(f);
     return write_file_system();
   }
@@ -203,6 +206,7 @@ void mkdir(string dname) {
 			dir->size = 0;
 			current_dir->sub_dirs.push_back(dir);
 			current_dir = dir;
+      write_file_system();
 		} else current_dir = tmpdir;
 
 		dir_exists = false;
@@ -246,7 +250,7 @@ void rmdir(string dname) {
 			path.pop_back();
 			current_dir->sub_dirs.erase(current_dir->sub_dirs.begin()+i);
 			delete tmpdir;
-
+      write_file_system();
 			return;
 		}
 	}

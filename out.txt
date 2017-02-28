@@ -1,0 +1,181 @@
+home
+|
+----dir1
+    |
+    ----subdir1
+    |
+    ----subdir2
+    |
+    ----subdir3
+    |
+    ----subdir4
+|
+----dir2
+dir1
+subdir1
+subdir2
+subdir3
+subdir4
+SUCCESS, fd=0
+SUCCESS, fd=0
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is fi
+SUCCESS, fd=0
+This 
+ is f
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+This is file1
+This is file2
+This is file3
+This is file4
+File does not exist. Please open file with write flag to create file.
+bar15

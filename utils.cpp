@@ -9,7 +9,6 @@
 using namespace std;
 
 string file_system = "file_system.txt";
-//int file_descriptor = 1;
 
 vector<string> break_string(string s) {
   string input;
@@ -244,15 +243,6 @@ void create_file_system() {
   return;
 }
 
-string retrieve_value(string l, int *j) {
-  string v = "";
-  while (*j < l.length()) {
-    v += l[*j];
-    *j=*j+1;
-  }
-  return v;
-}
-
 file_struct scan_directory(string fname, file_struct fs, string flag) {
   string line, content, val;
   bool file_found = false;
@@ -352,6 +342,10 @@ void recursive_write(ostream &ofile) {
   }
 
   //Read out closed files
+  for (int j=0; j<path.size(); j++) {
+    ofile << "/" << path[j];
+  }
+  ofile << endl;
   for(int i = 0; i < current_dir->files.size(); i++) {
     ofile << "File Name: " << current_dir->files[i]->fname << endl;
     ofile << "File Size: " << current_dir->files[i]->size << endl;

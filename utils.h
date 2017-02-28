@@ -33,13 +33,6 @@ void validate_and_call(vector<string> cmd);
 void create_file_system();
 
 // ############################################################################
-// # Retrieves the value after the colon, within the file system. Called by   #
-// # "scan_file()" to pull filename, file descriptor, file size, file offset, #
-// # and file contents.                                                       #
-// ############################################################################
-string retrieve_value(string l, int *j);
-
-// ############################################################################
 // # Responsible for scanning the file system for desired file. If it exists, #
 // # its details are placed in a class and entered into a vector to indicate  #
 // # that it has been accessed. If the desired file does not exist, it is     #
