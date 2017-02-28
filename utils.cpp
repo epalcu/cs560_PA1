@@ -197,7 +197,7 @@ void create_file_system() {
   directory *dir;
 
   dir = new directory;
-  dir->parent_dir == NULL;
+  dir->parent_dir = NULL;
   dir->size = 0;
   dir->name = "home";
   current_dir = dir;
@@ -223,10 +223,28 @@ string retrieve_value(string l, int *j) {
 file_struct scan_directory(string fname, file_struct fs, string flag) {
   string line, content, val;
   bool file_found = false;
+  bool fd_less = false;
+  for (int i=0; i<fd_list.size(); i++) {
+    if (fd_list[i] < file_descriptor) {
+      fd_less = true;
+      fs.fd = fd_list[i];
+      fd_list.erase(fd_list.begin()+i);
+      break;
+    }
+  }
+  if (!fd_less) {
+    fs.fd = file_descriptor;
+    file_descriptor++;
+  }
   for (int i=0; i<current_dir->files.size(); i++) {
     if (current_dir->files[i]->fname == fname) {
       file_found = true;
-      fs = *current_dir->files[i];
+      fs.fname = current_dir->files[i]->fname;
+      fs.size = current_dir->files[i]->size;
+      fs.offset = current_dir->files[i]->offset;
+      fs.contents = current_dir->files[i]->contents;
+      fs.path = current_dir->files[i]->path;
+      fs.operation = flag;
       //cout << current_dir->files[i]->contents << endl;
     }
   }
@@ -237,10 +255,8 @@ file_struct scan_directory(string fname, file_struct fs, string flag) {
 	  time_t now = time(0);
 	  fs.date = ctime(&now);
     fs.contents = " ";
-    fs.fd = file_descriptor;
     fs.operation = flag;
     fs.path = path;
-    file_descriptor++;
   }
   return fs;
 }
@@ -248,7 +264,11 @@ file_struct scan_directory(string fname, file_struct fs, string flag) {
 string remove_quotes(string statement) {
   string altered;
   for (int i=1; i<(statement.length()-1); i++) {
-    altered += statement[i];
+    if ((statement[i] == '\\') && (statement[i+1] == 'n')) {
+      altered += '\n';
+      i++;
+    }
+    else altered += statement[i];
   }
   return altered;
 }

@@ -1,12 +1,15 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <fstream>
+#include <ctime>
 #include "commands.h"
 
 using namespace std;
 
 vector<file_struct> files;
 int file_descriptor = 0;
+vector<int> fd_list;
 directory *current_dir = NULL;
 vector <string> path;
 int depth = 0;
@@ -67,7 +70,7 @@ void read(string fd, string size) {
         int updated_offset = current_offset+stoi(size);
         string output;
         int j = 0;
-        for (int j=current_offset; j<updated_offset; j++) {
+        for (j=current_offset; j<updated_offset; j++) {
           output += contents[j];
         }
         files[i].offset = j;
@@ -90,22 +93,30 @@ void write(string fd, string contents) {
       }
       else {
         string file_contents = files[i].contents;
-        contents = remove_quotes(contents);
-        int current_offset = files[i].offset;
-        int updated_offset = current_offset+contents.length();
+        int current_offset, updated_offset;
         string first_half, second_half, updated_contents;
-        int j = 0;
-        for (j=current_offset+1; j<file_contents.length(); j++) {
-          second_half += file_contents[j];
+        contents = remove_quotes(contents);
+        current_offset = files[i].offset;
+        if (current_offset == 0)  {
+          updated_offset = contents.length();
+          updated_contents = contents;
         }
-        for (j=0; j<(current_offset); j++) {
-          first_half += file_contents[j];
+        else {
+          // Gather second half contents after the offset
+          for (int j=current_offset; j<file_contents.length(); j++) {
+            second_half += file_contents[j];
+          }
+          // Gather the first half contents preceding the offset
+          for (int j=0; j<current_offset; j++) {
+            first_half += file_contents[j];
+          }
+          //Update contents by adding in first half of contents, written contents, and second half of contents
+          updated_contents = first_half + contents + second_half;
+          updated_offset = current_offset+contents.length();
         }
-        updated_contents = first_half + contents + second_half;
-        files[i].size = updated_contents.length();
         files[i].offset = updated_offset;
-        if (new_line) files[i].contents = updated_contents+'\n';
-        else files[i].contents = updated_contents;
+        files[i].size = updated_contents.length();
+        files[i].contents = updated_contents;
       }
       return;
     }
@@ -113,7 +124,17 @@ void write(string fd, string contents) {
   if (!file_found) cout << "File does not exist. Please open file with write flag to create file.\n";
 }
 
-void seek(string fd, string offset) {;}
+void seek(string fd, string offset) {
+  bool file_found = false;
+  for (int i=0; i<files.size(); i++) {
+    if (files[i].fd == stoi(fd)) {
+      file_found = true;
+      files[i].offset = stoi(offset);
+      return;
+    }
+  }
+  if (!file_found) cout << "File does not exist. Please open file with write flag to create file.\n";
+}
 
 void close(string fd) {
   bool file_open = false;
@@ -125,6 +146,7 @@ void close(string fd) {
     if (files[i].fd == stoi(fd)) {
       *f = files[i];
       file_open = true;
+      fd_list.push_back(files[i].fd);
       files.erase(files.begin()+i);
     }
   }
@@ -137,8 +159,8 @@ void close(string fd) {
         current_dir->files[i]->size = f->size;
         current_dir->files[i]->offset = f->offset;
         current_dir->files[i]->contents = f->contents;
-		current_dir->files[i]->size = f->size;
-		current_dir->files[i]->date = f->date;
+		    current_dir->files[i]->size = f->size;
+		    current_dir->files[i]->date = f->date;
         return;
       }
     }
@@ -228,13 +250,7 @@ void cat(string fname) {
     if (current_dir->files[i]->fname == fname) {
       file_found = true;
       string contents = current_dir->files[i]->contents;
-      for (int j=0; j<contents.length(); j++) {
-        if ((contents[j] == '\\') && (contents[j+1] == 'n')) {
-          cout << endl;
-          j++;
-        }
-        else cout << contents[j];
-      }
+      cout << contents;
       return;
     }
   }
@@ -281,9 +297,42 @@ void tree() {
 	}
 }
 
-void import_file(string source, string destination) {;}
+void import_file(string source, string destination) {
+  file_struct *f;
+  f = new file_struct;
+  ifstream file(source.c_str());
+  stringstream ss;
+  ss << file.rdbuf();
+  string contents = ss.str();
 
-void export_file(string source, string destination) {;}
+  f->fname = destination;
+  f->contents = contents;
+  f->size = contents.length();
+  f->offset = contents.length();
+  time_t now = time(0);
+  f->date = ctime(&now);
+  f->path = path;
+  current_dir->files.push_back(f);
+  return;
+}
+
+void export_file(string source, string destination) {
+  bool file_found = false;
+  ofstream ofile;
+  for (int i=0; i<current_dir->files.size(); i++) {
+    if (current_dir->files[i]->fname == source) {
+      file_found = true;
+      ofile.open(source, std::ofstream::out | std::ofstream::app);
+      ofile << current_dir->files[i]->contents;
+      ofile.close();
+      return;
+    }
+  }
+  if (!file_found) {
+    cout << "File does not exist.\n";
+    return;
+  }
+}
 
 void invalid_cmd(string cmd, string usage) {
   if (usage.compare("") == 0) cout << cmd << ": command not found\n";
