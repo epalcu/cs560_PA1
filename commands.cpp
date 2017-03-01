@@ -22,6 +22,7 @@ void mkfs() {
 void open(string fname, string flag) {
   bool duplicate = false;
   file_struct new_file;
+  // Check to see if file exists in vector of open files
   for (int i=0; i<files.size(); i++) {
     if (files[i].fname == fname) {
       duplicate = true;
@@ -34,20 +35,25 @@ void open(string fname, string flag) {
       return;
     }
   }
+  // If file not currently open
   if (!duplicate) {
     if (flag.compare("w") == 0) {
+      //Scan directory to see if file already exists in directory
       new_file = scan_directory(fname, new_file, flag);
       files.push_back(new_file);
       cout << "SUCCESS, fd=" << new_file.fd << endl;
       return;
     }
     else if (flag.compare("r") == 0) {
+      //Scan directory to see if file already exists in directory
       new_file = scan_directory(fname, new_file, flag);
+      // Can't read empty file
       if (new_file.size == 0) {
         file_descriptor--;
         cout << "File does not exist. Please open file with write flag to create file.\n";
       }
       else {
+        // Place onto vector of open files
         files.push_back(new_file);
         cout << "SUCCESS, fd=" << new_file.fd << endl;
       }
@@ -59,6 +65,7 @@ void open(string fname, string flag) {
 
 void read(string fd, string size) {
   bool file_found = false;
+  // Check to see if file in vector of open files
   for (int i=0; i<files.size(); i++) {
     if (files[i].fd == stoi(fd)) {
       file_found = true;
@@ -71,9 +78,11 @@ void read(string fd, string size) {
         int updated_offset = stoi(size)+current_offset;
         string output;
         int j = 0;
+        // Begin reading from specified offset
         for (j=current_offset; j<updated_offset; j++) {
           output += contents[j];
         }
+        // Set offset to end of read
         files[i].offset = j;
         cout << output << endl;
       }
@@ -86,6 +95,7 @@ void read(string fd, string size) {
 void write(string fd, string contents) {
   bool file_found = false;
   bool new_line = false;
+  // Check to see if file exists in open file vector
   for (int i=0; i<files.size(); i++) {
     if (files[i].fd == stoi(fd)) {
       file_found = true;
@@ -98,6 +108,7 @@ void write(string fd, string contents) {
         string first_half, second_half, updated_contents;
         contents = remove_quotes(contents);
         current_offset = files[i].offset;
+        // Upon first write, offset is set to end of file
         if (current_offset == 0)  {
           updated_offset = contents.length();
           updated_contents = contents;
@@ -129,9 +140,11 @@ void write(string fd, string contents) {
 
 void seek(string fd, string offset) {
   bool file_found = false;
+  // Check to see if file is in vector of open files
   for (int i=0; i<files.size(); i++) {
     if (files[i].fd == stoi(fd)) {
       file_found = true;
+      // Set the offset value to index value
       files[i].offset = stoi(offset)-1;
       return;
     }
@@ -164,6 +177,7 @@ void close(string fd) {
         current_dir->files[i]->contents = f->contents;
 		    current_dir->files[i]->size = f->size;
 		    current_dir->files[i]->date = f->date;
+        // Write file to file system
         return write_file_system();
       }
     }
@@ -176,6 +190,7 @@ void close(string fd) {
   if (!file_directory) {
     f->offset = 0;
     current_dir->files.push_back(f);
+    // Write file to file system
     return write_file_system();
   }
 }
@@ -300,6 +315,7 @@ void ls() {
 
 void cat(string fname) {
   bool file_found = false;
+  // Check to see if file exists in directory
   for (int i=0; i<current_dir->files.size(); i++) {
     if (current_dir->files[i]->fname == fname) {
       file_found = true;
@@ -382,11 +398,12 @@ void tree() {
 void import_file(string source, string destination) {
   file_struct *f;
   f = new file_struct;
+  // Read in file specified in the host machine
   ifstream file(source.c_str());
   stringstream ss;
   ss << file.rdbuf();
   string contents = ss.str();
-
+  // Create file_struct for imported file and push onto directory's vector of files
   f->fname = destination;
   f->contents = contents;
   f->size = contents.length();
@@ -401,9 +418,11 @@ void import_file(string source, string destination) {
 void export_file(string source, string destination) {
   bool file_found = false;
   ofstream ofile;
+  // Check to make sure desired file for exporting actually exists
   for (int i=0; i<current_dir->files.size(); i++) {
     if (current_dir->files[i]->fname == source) {
       file_found = true;
+      // Write file out to specified file on host machine
       ofile.open(source, std::ofstream::out | std::ofstream::app);
       ofile << current_dir->files[i]->contents;
       ofile.close();

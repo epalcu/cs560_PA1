@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include "utils.cpp"
-//#include "fs.h"
 
 using namespace std;
 
@@ -12,7 +11,7 @@ int main(int argc, char* argv[]) {
     string cmd;
     vector<string> command;
     //cout << "> ";
-    while(getline(cin, cmd)) { 
+    while(getline(cin, cmd)) {
       if ((cmd.compare("exit()") == 0) || (cmd.compare("exit") == 0)) break;
       cmd += '\n';
       command = break_string(cmd);

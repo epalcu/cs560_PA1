@@ -40,6 +40,10 @@ void create_file_system();
 // ############################################################################
 file_struct scan_directory(string fd, file_struct fs, string flag);
 
+// ############################################################################
+// # Responsible for removing quotation marks from user contents upon a write #
+// # command.                                                                 #
+// ############################################################################
 string remove_quotes(string statement);
 
 void print_directory_contents();
