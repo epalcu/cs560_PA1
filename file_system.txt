@@ -1,24 +1,11 @@
 /home
-File Name: foo
-File Size: 4
-File Offset: 0
-File Contents: Hey
-
-File Path: /home
-
-File Name: dog
-File Size: 0
-File Offset: 0
-File Contents:  
-File Path: /home
-
 File Name: bar
 File Size: 0
 File Offset: 0
 File Contents:  
 File Path: /home
 
-File Name: cat
+File Name: foo
 File Size: 0
 File Offset: 0
 File Contents:  
