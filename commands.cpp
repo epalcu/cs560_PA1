@@ -22,41 +22,52 @@ void mkfs() {
 void open(string fname, string flag) {
   bool duplicate = false;
   file_struct new_file;
+	
   // Check to see if file exists in vector of open files
   for (int i=0; i<files.size(); i++) {
     if (files[i].fname == fname) {
       duplicate = true;
+	    
       if (files[i].operation.compare("r") == 0) {
         cout << "File already open for reading.\n";
       }
       else if (files[i].operation.compare("w") == 0) {
         cout << "File already open for writing.\n";
       }
+	    
       return;
     }
   }
+	
   // If file not currently open
   if (!duplicate) {
     if (flag.compare("w") == 0) {
+	    
       //Scan directory to see if file already exists in directory
       new_file = scan_directory(fname, new_file, flag);
       files.push_back(new_file);
+	    
       cout << "SUCCESS, fd=" << new_file.fd << endl;
+	    
       return;
     }
     else if (flag.compare("r") == 0) {
+	    
       //Scan directory to see if file already exists in directory
       new_file = scan_directory(fname, new_file, flag);
+	    
       // Can't read empty file
       if (new_file.size == 0) {
         file_descriptor--;
         cout << "File does not exist. Please open file with write flag to create file.\n";
       }
       else {
+	      
         // Place onto vector of open files
         files.push_back(new_file);
         cout << "SUCCESS, fd=" << new_file.fd << endl;
       }
+	    
       return;
     }
     else return invalid_cmd("open", "Usage: open [filename] [flag]");
@@ -65,10 +76,12 @@ void open(string fname, string flag) {
 
 void read(string fd, string size) {
   bool file_found = false;
+	
   // Check to see if file in vector of open files
   for (int i=0; i<files.size(); i++) {
     if (files[i].fd == stoi(fd)) {
       file_found = true;
+	    
       if (files[i].operation.compare("w") == 0) {
         cout << "File previously opened for writing. Please close file and reopen for reading.\n";
       }
@@ -78,14 +91,18 @@ void read(string fd, string size) {
         int updated_offset = stoi(size)+current_offset;
         string output;
         int j = 0;
+	      
         // Begin reading from specified offset
         for (j=current_offset; j<updated_offset; j++) {
           output += contents[j];
         }
+	      
         // Set offset to end of read
         files[i].offset = j;
+	      
         cout << output << endl;
       }
+	    
       return;
     }
   }
@@ -95,10 +112,12 @@ void read(string fd, string size) {
 void write(string fd, string contents) {
   bool file_found = false;
   bool new_line = false;
+	
   // Check to see if file exists in open file vector
   for (int i=0; i<files.size(); i++) {
     if (files[i].fd == stoi(fd)) {
       file_found = true;
+	    
       if (files[i].operation.compare("r") == 0) {
         cout << "File previously opened for reading. Please close file and reopen for writing.\n";
       }
@@ -108,6 +127,7 @@ void write(string fd, string contents) {
         string first_half, second_half, updated_contents;
         contents = remove_quotes(contents);
         current_offset = files[i].offset;
+	      
         // Upon first write, offset is set to end of file
         if (current_offset == 0)  {
           updated_offset = contents.length();
@@ -115,12 +135,15 @@ void write(string fd, string contents) {
         }
         else {
           updated_offset = contents.length()+current_offset;
+		
           // Gather the first half contents preceding the offset
           for (int j=0; j<current_offset; j++) {
             first_half += file_contents[j];
           }
+		
           // Update the contents by concatenating the ifrst half of origin alcontents and new contents
           updated_contents = first_half + contents;
+		
           // Update contents if newly created contents shorter than previous content amount
           if (updated_offset < file_contents.length()) {
             for (int j=updated_offset; j<file_contents.length(); j++) {
@@ -132,6 +155,7 @@ void write(string fd, string contents) {
         files[i].size = updated_contents.length();
         files[i].contents = updated_contents;
       }
+	    
       return;
     }
   }
@@ -140,12 +164,15 @@ void write(string fd, string contents) {
 
 void seek(string fd, string offset) {
   bool file_found = false;
+	
   // Check to see if file is in vector of open files
   for (int i=0; i<files.size(); i++) {
     if (files[i].fd == stoi(fd)) {
       file_found = true;
+	    
       // Set the offset value to index value
       files[i].offset = stoi(offset)-1;
+	    
       return;
     }
   }
@@ -157,15 +184,18 @@ void close(string fd) {
   file_struct *f;
   f = new file_struct;
   bool file_directory = false;
+	
   // Traverse open files vector; if desired file is open, remove it from vector
   for (int i=0; i<files.size(); i++) {
     if (files[i].fd == stoi(fd)) {
       *f = files[i];
       file_open = true;
+	    
       fd_list.push_back(files[i].fd);
       files.erase(files.begin()+i);
     }
   }
+	
   // If file exists in directory vector of files, simply update its contents
   if (file_open) {
     for (int i=0; i<current_dir->files.size(); i++) {
@@ -177,6 +207,7 @@ void close(string fd) {
         current_dir->files[i]->contents = f->contents;
 		    current_dir->files[i]->size = f->size;
 		    current_dir->files[i]->date = f->date;
+	      
         // Write file to file system
         return write_file_system();
       }
@@ -184,12 +215,15 @@ void close(string fd) {
   }
   else {
     cout << "File does not exist. Please open file with write flag to create file.\n";
+	  
     return;
   }
+	
   // If file does not exist in directory vector of files, push it on
   if (!file_directory) {
     f->offset = 0;
     current_dir->files.push_back(f);
+	  
     // Write file to file system
     return write_file_system();
   }
@@ -236,6 +270,7 @@ void rmdir(string dname) {
 
 	//Check if specified directory exists
 	for(i = 0; i < current_dir->sub_dirs.size(); i++) {
+		
 		//Specified directory was found, move into that directory
 		if(current_dir->sub_dirs[i]->name == dname) {
 			path.push_back(current_dir->sub_dirs[i]->name);
@@ -315,12 +350,15 @@ void ls() {
 
 void cat(string fname) {
   bool file_found = false;
+	
   // Check to see if file exists in directory
   for (int i=0; i<current_dir->files.size(); i++) {
     if (current_dir->files[i]->fname == fname) {
       file_found = true;
       string contents = current_dir->files[i]->contents;
+	    
       cout << contents;
+	    
       return;
     }
   }
@@ -398,11 +436,13 @@ void tree() {
 void import_file(string source, string destination) {
   file_struct *f;
   f = new file_struct;
+	
   // Read in file specified in the host machine
   ifstream file(source.c_str());
   stringstream ss;
   ss << file.rdbuf();
   string contents = ss.str();
+	
   // Create file_struct for imported file and push onto directory's vector of files
   f->fname = destination;
   f->contents = contents;
@@ -412,25 +452,30 @@ void import_file(string source, string destination) {
   f->date = ctime(&now);
   f->path = path;
   current_dir->files.push_back(f);
+	
   return;
 }
 
 void export_file(string source, string destination) {
   bool file_found = false;
   ofstream ofile;
+	
   // Check to make sure desired file for exporting actually exists
   for (int i=0; i<current_dir->files.size(); i++) {
     if (current_dir->files[i]->fname == source) {
       file_found = true;
+	    
       // Write file out to specified file on host machine
       ofile.open(source, std::ofstream::out | std::ofstream::app);
       ofile << current_dir->files[i]->contents;
       ofile.close();
+	    
       return;
     }
   }
   if (!file_found) {
     cout << "File does not exist.\n";
+	  
     return;
   }
 }
